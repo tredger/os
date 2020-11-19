@@ -60,14 +60,14 @@ ARG DISTRIB_ID=BurmillaOS
 
 ARG SELINUX_POLICY_URL=https://github.com/burmilla/refpolicy/releases/download/v0.0.3/policy.29
 
-ARG KERNEL_VERSION=4.14.206-burmilla
+ARG KERNEL_VERSION=5.9.6-burmilla
 ARG KERNEL_URL_amd64=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-x86.tar.gz
 ARG KERNEL_URL_arm64=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-arm64.tar.gz
 
 ARG BUILD_DOCKER_URL_amd64=https://get.docker.com/builds/Linux/x86_64/docker-1.10.3
 ARG BUILD_DOCKER_URL_arm64=https://github.com/burmilla/docker/releases/download/v1.10.3-ros1/docker-1.10.3_arm64
 
-ARG OS_RELEASES_YML=https://raw.githubusercontent.com/burmilla/releases/kernel-4.14.x
+ARG OS_RELEASES_YML=https://raw.githubusercontent.com/burmilla/releases/v2.0.x
 
 ARG OS_SERVICES_REPO=https://raw.githubusercontent.com/${OS_REPO}/os-services
 ARG IMAGE_NAME=${OS_REPO}/os
@@ -86,7 +86,7 @@ ARG SYSTEM_DOCKER_VERSION=17.06-ros6
 ARG SYSTEM_DOCKER_URL_amd64=https://github.com/burmilla/os-system-docker/releases/download/${SYSTEM_DOCKER_VERSION}/docker-amd64-${SYSTEM_DOCKER_VERSION}.tgz
 ARG SYSTEM_DOCKER_URL_arm64=https://github.com/burmilla/os-system-docker/releases/download/${SYSTEM_DOCKER_VERSION}/docker-arm64-${SYSTEM_DOCKER_VERSION}.tgz
 
-ARG USER_DOCKER_VERSION=19.03.13
+ARG USER_DOCKER_VERSION=20.10.0
 ARG USER_DOCKER_ENGINE_VERSION=docker-${USER_DOCKER_VERSION}
 
 ARG AZURE_SERVICE=false

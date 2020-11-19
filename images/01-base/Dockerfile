@@ -25,12 +25,10 @@ RUN rm /sbin/poweroff /sbin/reboot /sbin/halt && \
     passwd -l root && \
     addgroup -g 1100 rancher && \
     addgroup -g 1101 docker && \
-    addgroup -g 1103 sudo && \
     adduser -u 1100 -G rancher -D -h /home/rancher -s /bin/bash rancher && \
     adduser -u 1101 -G docker -D -h /home/docker -s /bin/bash docker && \
-    adduser rancher docker && \
-    adduser rancher sudo && \
-    adduser docker sudo && \
+    sed -i 's/sudo:x:1004:/sudo:x:1004:rancher,docker/' /etc/group && \
+    sed -i 's/docker:x:1101:/docker:x:1101:rancher,docker/' /etc/group && \
     echo '%sudo ALL=(ALL) ALL' >> /etc/sudoers && \
     ln -s /dev/null /etc/udev/rules.d/80-net-name-slot.rules && \
     sed -i s/"partx --update \"\$part\" \"\$dev\""/"partx --update --nr \"\$part\" \"\$dev\""/g /usr/bin/growpart && \
