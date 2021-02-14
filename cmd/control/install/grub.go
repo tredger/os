@@ -21,8 +21,8 @@ func RunGrub(baseName, device string) error {
 	return nil
 }
 
-func grubConfig(menu BootVars) error {
-	log.Debugf("grubConfig")
+func GrubConfig(menu BootVars) error {
+	log.Debugf("GrubConfig")
 
 	filetmpl, err := template.New("grub2config").Parse(`{{define "grub2menu"}}menuentry "{{.Name}}" {
   set root=(hd0,msdos1)
@@ -46,7 +46,7 @@ set timeout="{{.Timeout}}"
 	}
 
 	cfgFile := filepath.Join(menu.BaseName, menu.BootDir+"grub/grub.cfg")
-	log.Debugf("grubConfig written to %s", cfgFile)
+	log.Debugf("GrubConfig written to %s", cfgFile)
 
 	f, err := os.Create(cfgFile)
 	if err != nil {

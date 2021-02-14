@@ -8,6 +8,7 @@ RUN apt-get update \
                            sudo less curl ca-certificates psmisc htop kmod iproute2 \
                            net-tools bash-completion wget \
                            nano open-iscsi iputils-ping \
+                           dosfstools \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /etc/ssh/*key* \
     && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen \

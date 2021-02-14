@@ -69,7 +69,7 @@ func ReadSyslinuxCfg(currentCfg string) (string, string, error) {
 	vmlinuzFile := ""
 	initrdFile := ""
 	// Need to parse currentCfg for the lines:
-	// KERNEL ../vmlinuz-4.9.18-rancher^M
+	// LINUX ../vmlinuz-4.9.18-rancher^M
 	// INITRD ../initrd-41e02e6-dirty^M
 	buf, err := ioutil.ReadFile(currentCfg)
 	if err != nil {
@@ -81,8 +81,8 @@ func ReadSyslinuxCfg(currentCfg string) (string, string, error) {
 	s := bufio.NewScanner(bytes.NewReader(buf))
 	for s.Scan() {
 		line := strings.TrimSpace(s.Text())
-		if strings.HasPrefix(line, "KERNEL") {
-			vmlinuzFile = strings.TrimSpace(strings.TrimPrefix(line, "KERNEL"))
+		if strings.HasPrefix(line, "LINUX") {
+			vmlinuzFile = strings.TrimSpace(strings.TrimPrefix(line, "LINUX"))
 			vmlinuzFile = filepath.Join(DIST, filepath.Base(vmlinuzFile))
 		}
 		if strings.HasPrefix(line, "INITRD") {
