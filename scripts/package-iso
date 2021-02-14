@@ -28,6 +28,16 @@ cp -r ${DIST}/boot/* ${CD}/boot/
 cp /usr/lib/ISOLINUX/isolinux.bin              ${CD}/boot/isolinux/
 cp /usr/lib/syslinux/modules/bios/ldlinux.c32  ${CD}/boot/isolinux/
 cp /usr/lib/syslinux/modules/bios/*.c32        ${CD}/boot/isolinux/
+
+# add UEFI support
+mkdir -p ${DOWNLOADS}/cd-boot-images_extract
+dpkg -x ${DOWNLOADS}/cd-boot-images.deb ${DOWNLOADS}/cd-boot-images_extract
+rm -rf ${DOWNLOADS}/cd-boot-images_extract/usr/share/cd-boot-images-amd64/tree/boot/grub/i386-pc
+mv ${DOWNLOADS}/cd-boot-images_extract/usr/share/cd-boot-images-amd64/tree/EFI ${CD}/
+mv ${DOWNLOADS}/cd-boot-images_extract/usr/share/cd-boot-images-amd64/tree/boot/grub ${CD}/boot/
+rm -rf ${DOWNLOADS}/cd-boot-images_extract
+cat scripts/grub.cfg | envsubst > ${CD}/boot/grub/grub.cfg
+
 # add the installer image to the iso for non-network / dev/test
 cp ${ARTIFACTS}/installer.tar                  ${CD}/rancheros/
 cp ${ARTIFACTS}/Dockerfile.${ARCH}             ${CD}/rancheros/
