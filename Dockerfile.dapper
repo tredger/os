@@ -99,6 +99,7 @@ ARG CD_BOOT_IMAGES_URL=http://archive.ubuntu.com/ubuntu/pool/main/c/cd-boot-imag
 
 ARG AZURE_SERVICE=false
 ARG PROXMOXVE_SERVICE=false
+ARG SKIP_BUILD=false
 ######################################################
 
 # Set up environment and export all ARGS as ENV
@@ -143,7 +144,8 @@ ENV BUILD_DOCKER_URL=BUILD_DOCKER_URL_${ARCH} \
     CD_BOOT_IMAGES_VERSION=${CD_BOOT_IMAGES_VERSION} \
     CD_BOOT_IMAGES_URL=${CD_BOOT_IMAGES_URL} \
     AZURE_SERVICE=${AZURE_SERVICE} \
-    PROXMOXVE_SERVICE=${PROXMOXVE_SERVICE}
+    PROXMOXVE_SERVICE=${PROXMOXVE_SERVICE} \
+    SKIP_BUILD=${SKIP_BUILD}
 ENV PATH=${GOPATH}/bin:/usr/local/go/bin:$PATH
 
 RUN mkdir -p ${DOWNLOADS}
@@ -151,7 +153,7 @@ RUN mkdir -p ${DOWNLOADS}
 # Download kernel
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "... Downloading  ${!KERNEL_URL}"; \
-    if [ -n "${!KERNEL_URL}" ]; then \
+    if [ "${!KERNEL_URL}" != "skip" ]; then \
         curl -fL ${!KERNEL_URL} > ${DOWNLOADS}/kernel.tar.xz \
     ;fi
 
