@@ -13,7 +13,7 @@ cp assets/*.tar.gz build/
 # size of root and boot partion (in MByte)
 IMAGE_TOTAL_SIZE=2048
 BOOT_PARTITION_START=2048
-BOOT_PARTITION_SIZE=30
+BOOT_PARTITION_SIZE=50
 #---don't change here---
 BOOT_PARTITION_OFFSET="$((BOOT_PARTITION_START*512))"
 BOOT_PARTITION_BYTES="$((BOOT_PARTITION_SIZE*1024*1024))"
@@ -33,7 +33,7 @@ losetup
 PART1_DEVICE=$(losetup -f)
 losetup -d ${PART1_DEVICE} || /bin/true
 losetup --offset $BOOT_PARTITION_OFFSET --sizelimit $BOOT_PARTITION_BYTES ${PART1_DEVICE} build/run.img
-mkfs.vfat -n RancherOS ${PART1_DEVICE}
+mkfs.vfat -n BurmillaOS ${PART1_DEVICE}
 
 # partition #2 - Type=83 Linux
 PART2_DEVICE=$(losetup -f)
@@ -51,8 +51,8 @@ rm -rf build/root/lost+found
 mkdir -p build/root/boot
 mount -t vfat -o loop=${PART1_DEVICE},offset=$BOOT_PARTITION_OFFSET build/run.img build/root/boot
 rm -rf build/root/boot/lost+found
-echo "RancherOS: boot partition" > build/root/boot/boot.txt
-echo "RancherOS: root partition" > build/root/root.txt
+echo "BurmillaOS: boot partition" > build/root/boot/boot.txt
+echo "BurmillaOS: root partition" > build/root/root.txt
 
 # unpack and cleanup the basefs
 #- doing this on a local folder keeps our resulting image clean (no dirty blocks from a delete)
@@ -60,7 +60,7 @@ mkdir -p build/basefs
 tar -C build/basefs -zxvf build/kernel.tar.gz
 tar -C build/basefs -zxvf build/rpi-bootfiles.tar.gz
 
-# populate kernel, bootloader and RancherOS rootfs
+# populate kernel, bootloader and BurmillaOS rootfs
 cp -R build/basefs/* build/root
 tar -xf assets/rootfs_arm64.tar.gz -C build/root
 echo "+dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 cgroup-enable=memory swapaccount=1 elevator=deadline rootwait console=ttyAMA0,115200 console=tty0 rancher.password=rancher rancher.autologin=ttyAMA0 rw init=/init" > build/root/boot/cmdline.txt
