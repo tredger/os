@@ -63,7 +63,7 @@ ARG SELINUX_POLICY_URL=https://github.com/burmilla/refpolicy/releases/download/v
 ARG KERNEL_VERSION=5.10.16-burmilla
 ARG KERNEL_URL_amd64=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-x86.tar.gz
 ARG KERNEL_URL_arm64=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-arm64.tar.gz
-ARG KERNEL_URL_mips64el=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-mips64el.tar.xz
+ARG KERNEL_URL_mips64el=https://github.com/burmilla/os-kernel/releases/download/v${KERNEL_VERSION}/linux-${KERNEL_VERSION}-mips64el.tar.gz
 
 ARG BUILD_DOCKER_URL_amd64=https://get.docker.com/builds/Linux/x86_64/docker-1.10.3
 ARG BUILD_DOCKER_URL_arm64=https://github.com/burmilla/docker/releases/download/v1.10.3-ros1/docker-1.10.3_arm64
@@ -154,7 +154,7 @@ RUN mkdir -p ${DOWNLOADS}
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "... Downloading  ${!KERNEL_URL}"; \
     if [ "${!KERNEL_URL}" != "skip" ]; then \
-        curl -fL ${!KERNEL_URL} > ${DOWNLOADS}/kernel.tar.xz \
+        curl -fL ${!KERNEL_URL} > ${DOWNLOADS}/kernel.tar.gz \
     ;fi
 
 # Download EFI files
