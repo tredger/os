@@ -1,2 +1,0 @@
-FROM raspberry-pi-hypriot64:feat-cgroup-v2
-COPY . /source/
