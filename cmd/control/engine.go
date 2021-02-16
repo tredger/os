@@ -22,6 +22,7 @@ import (
 
 	yaml "github.com/cloudfoundry-incubator/candiedyaml"
 	"github.com/codegangsta/cli"
+	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/reference"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
@@ -52,7 +53,7 @@ func engineSubcommands() []cli.Command {
 		{
 			Name:        "create",
 			Usage:       "create Dind engine without a reboot",
-			Description: "must switch user docker to 17.12.1 or earlier if using Dind",
+			Description: "must switch user docker",
 			ArgsUsage:   "<name>",
 			Before:      preFlightValidate,
 			Action:      engineCreate,
@@ -60,11 +61,7 @@ func engineSubcommands() []cli.Command {
 				cli.StringFlag{
 					Name:  "version, v",
 					Value: config.DefaultDind,
-					Usage: fmt.Sprintf("set the version for the engine, %s are available", config.SupportedDinds),
-				},
-				cli.StringFlag{
-					Name:  "network",
-					Usage: "set the network for the engine",
+					Usage: fmt.Sprintf("set the version for the engine"),
 				},
 				cli.StringFlag{
 					Name:  "fixed-ip",
@@ -163,11 +160,10 @@ func engineCreate(c *cli.Context) error {
 		sshPort = randomSSHPort()
 	}
 	authorizedKeys := c.String("authorized-keys")
-	network := c.String("network")
 	fixedIP := c.String("fixed-ip")
 
 	// generate & create engine compose
-	err := generateEngineCompose(name, version, sshPort, authorizedKeys, network, fixedIP)
+	err := generateEngineCompose(name, version, sshPort, authorizedKeys, fixedIP)
 	if err != nil {
 		return err
 	}
@@ -422,18 +418,6 @@ func preFlightValidate(c *cli.Context) error {
 		return err
 	}
 
-	isVersionMatch := false
-	for _, v := range config.SupportedDinds {
-		if v == version {
-			isVersionMatch = true
-			break
-		}
-	}
-
-	if !isVersionMatch {
-		return errors.Errorf("Engine version not supported only %v are supported", config.SupportedDinds)
-	}
-
 	if c.String("ssh-port") != "" {
 		port, err := strconv.Atoi(c.String("ssh-port"))
 		if err != nil {
@@ -470,7 +454,7 @@ func randomSSHPort() int {
 	return l.Addr().(*net.TCPAddr).Port
 }
 
-func generateEngineCompose(name, version string, sshPort int, authorizedKeys, network, fixedIP string) error {
+func generateEngineCompose(name, version string, sshPort int, authorizedKeys, fixedIP string) error {
 	if err := os.MkdirAll(path.Dir(config.MultiDockerConfFile), 0700); err != nil && !os.IsExist(err) {
 		log.Errorf("Failed to create directory for file %s: %v", config.MultiDockerConfFile, err)
 		return err
@@ -503,15 +487,20 @@ func generateEngineCompose(name, version string, sshPort int, authorizedKeys, ne
 		volumes = append(volumes, authorizedKeys+":/root/.ssh/authorized_keys")
 	}
 
+	if _, _, err := idtools.AddNamespaceRangesUser(name); err != nil {
+		return err
+	}
+
 	composeConfigs[name] = composeConfig.ServiceConfigV1{
 		Image:       "${REGISTRY_DOMAIN}/" + version,
 		Restart:     "always",
 		Privileged:  true,
-		Net:         network,
+		Net:         "host",
 		Ports:       []string{strconv.Itoa(sshPort) + ":22"},
 		Volumes:     volumes,
 		VolumesFrom: []string{},
 		Command: composeYaml.Command{
+			"--userns-remap=" + name + ":" + name,
 			"--storage-driver=overlay2",
 			"--data-root=" + config.MultiDockerDataDir + "/" + name,
 			"--host=unix://" + config.MultiDockerDataDir + "/" + name + "/docker-" + name + ".sock",
@@ -520,7 +509,6 @@ func generateEngineCompose(name, version string, sshPort int, authorizedKeys, ne
 			"io.rancher.os.scope":     "system",
 			"io.rancher.os.after":     "console",
 			config.UserDockerLabel:    name,
-			config.UserDockerNetLabel: network,
 			config.UserDockerFIPLabel: fixedIP,
 		},
 	}

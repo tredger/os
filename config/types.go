@@ -26,7 +26,7 @@ const (
 	UserImages       = "images-user.tar"
 	Debug            = false
 	SystemDockerBin  = "/usr/bin/system-dockerd"
-	DefaultDind      = "burmilla/os-dind:17.12.1"
+	DefaultDind      = "burmilla/os-docker:20.10.3" // FixMe!
 
 	DetachLabel        = "io.rancher.os.detach"
 	CreateOnlyLabel    = "io.rancher.os.createonly"
@@ -78,10 +78,6 @@ var (
 		"rancher.password",
 		"rancher.autologin",
 		"EXTRA_CMDLINE",
-	}
-	SupportedDinds = []string{
-		"burmilla/os-dind:17.12.1",
-		"burmilla/os-dind:18.03.1",
 	}
 )
 
