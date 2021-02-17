@@ -20,7 +20,7 @@ func switchConsoleAction(c *cli.Context) error {
 
 	cfg := config.LoadConfig()
 
-	project, err := compose.GetProject(cfg, true, false)
+	project, err := compose.GetProject(cfg, true, false, false)
 	if err != nil {
 		return err
 	}

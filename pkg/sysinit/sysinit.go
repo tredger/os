@@ -103,7 +103,7 @@ func SysInit() error {
 		config.CfgFuncs{
 			{Name: "loadSystemImages", Func: LoadSystemImages},
 			{Name: "start project", Func: func(cfg *config.CloudConfig) (*config.CloudConfig, error) {
-				p, err := compose.GetProject(cfg, false, true)
+				p, err := compose.GetProject(cfg, false, true, false)
 				if err != nil {
 					return cfg, err
 				}

@@ -82,7 +82,11 @@ func loadEngineService(cfg *config.CloudConfig, p *project.Project) error {
 	return LoadSpecialService(p, cfg, "docker", cfg.Rancher.Docker.Engine)
 }
 
-func projectReload(p *project.Project, useNetwork *bool, loadConsole bool, environmentLookup *docker.ConfigEnvironment, authLookup *docker.ConfigAuthLookup) func() error {
+func loadK3sService(cfg *config.CloudConfig, p *project.Project) error {
+	return LoadSpecialService(p, cfg, "k3s", "k3s")
+}
+
+func projectReload(p *project.Project, useNetwork *bool, loadConsole bool, loadK3s bool, environmentLookup *docker.ConfigEnvironment, authLookup *docker.ConfigAuthLookup) func() error {
 	enabled := map[interface{}]interface{}{}
 	return func() error {
 		cfg := config.LoadConfig()
@@ -114,6 +118,12 @@ func projectReload(p *project.Project, useNetwork *bool, loadConsole bool, envir
 		if loadConsole {
 			if err := loadConsoleService(cfg, p); err != nil {
 				log.Errorf("Failed to load rancher.console=(%s): %v", cfg.Rancher.Console, err)
+			}
+		}
+
+		if loadK3s {
+			if err := loadK3sService(cfg, p); err != nil {
+				log.Errorf("Failed to load rancher.k3s.engine=(%s): %v", "k3s", err)
 			}
 		}
 

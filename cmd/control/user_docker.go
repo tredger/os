@@ -152,7 +152,7 @@ func startDocker(cfg *config.CloudConfig) error {
 
 	log.Infof("Starting Docker in context: %s", storageContext)
 
-	p, err := compose.GetProject(cfg, true, false)
+	p, err := compose.GetProject(cfg, true, false, false)
 	if err != nil {
 		return err
 	}

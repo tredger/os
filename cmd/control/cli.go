@@ -74,6 +74,12 @@ func Main() {
 			Subcommands: engineSubcommands(),
 		},
 		{
+			Name:        "k3s",
+			Usage:       "manage which k3s engine is used",
+			HideHelp:    true,
+			Subcommands: k3sSubcommands(),
+		},
+		{
 			Name:            "entrypoint",
 			Hidden:          true,
 			HideHelp:        true,

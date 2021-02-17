@@ -154,7 +154,7 @@ func consoleInitFunc() error {
 		log.Error(err)
 	}
 
-	p, err := compose.GetProject(cfg, false, true)
+	p, err := compose.GetProject(cfg, false, true, false)
 	if err != nil {
 		log.Error(err)
 	}
@@ -197,6 +197,22 @@ sudo ros service up docker-compose
 	}
 	if _, err := os.Stat("/var/lib/rancher/compose/docker-compose"); os.IsNotExist(err) {
 		if err := ioutil.WriteFile("/var/lib/rancher/compose/docker-compose", []byte(ComposePlaceholder), 0755); err != nil {
+			log.Error(err)
+		}
+	}
+
+	// create placeholder for start-k3s.sh
+	const K3sPlaceholder = `
+#!/bin/sh
+/bin/k3s server --cluster-init --tls-san "0.0.0.0"
+`
+	if _, err := os.Stat("/etc/k3s"); os.IsNotExist(err) {
+		if err := os.MkdirAll("/etc/k3s", 0555); err != nil {
+			log.Error(err)
+		}
+	}
+	if _, err := os.Stat("/etc/k3s/start-k3s.sh"); os.IsNotExist(err) {
+		if err := ioutil.WriteFile("/etc/k3s/start-k3s.sh", []byte(K3sPlaceholder), 0755); err != nil {
 			log.Error(err)
 		}
 	}

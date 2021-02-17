@@ -131,7 +131,7 @@ func engineSwitch(c *cli.Context) error {
 	cfg := config.LoadConfig()
 	validateEngine(newEngine, cfg)
 
-	project, err := compose.GetProject(cfg, true, false)
+	project, err := compose.GetProject(cfg, true, false, false)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -214,7 +214,7 @@ func dindEngineRemove(c *cli.Context) error {
 
 	name := c.Args()[0]
 	cfg := config.LoadConfig()
-	p, err := compose.GetProject(cfg, true, false)
+	p, err := compose.GetProject(cfg, true, false, false)
 	if err != nil {
 		log.Fatalf("Get project failed: %v", err)
 	}

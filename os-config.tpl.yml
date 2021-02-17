@@ -259,6 +259,7 @@ rancher:
       volumes_from:
       - all-volumes
       volumes:
+      - /etc/k3s:/etc/k3s
       - /media:/media:shared
       - /mnt:/mnt:shared
     logrotate:

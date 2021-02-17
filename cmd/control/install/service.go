@@ -64,6 +64,12 @@ func GetCacheImageList(cloudconfig string, oldcfg *config.CloudConfig) []string 
 
 	}
 
+	// k3s engine
+	k3sImage := getServiceImage("k3s", "", oldcfg, newcfg)
+	if k3sImage != "" {
+		savedImages = append(savedImages, k3sImage)
+	}
+
 	return savedImages
 }
 
@@ -124,6 +130,18 @@ func formatImage(image string, oldcfg, newcfg *config.CloudConfig) string {
 	image = strings.Replace(image, "${REGISTRY_DOMAIN}", registryDomain, -1)
 
 	image = strings.Replace(image, "${SUFFIX}", config.Suffix, -1)
+
+	k3sRepo := newcfg.Rancher.Environment["K3S_REPO"]
+	if k3sRepo == "" {
+		k3sRepo = oldcfg.Rancher.Environment["K3S_REPO"]
+	}
+	image = strings.Replace(image, "${K3S_REPO}", k3sRepo, -1)
+
+	k3sVersion := newcfg.Rancher.Environment["K3S_VERSION"]
+	if k3sVersion == "" {
+		k3sVersion = oldcfg.Rancher.Environment["K3S_VERSION"]
+	}
+	image = strings.Replace(image, "${K3S_VERSION}", k3sVersion, -1)
 
 	return image
 }

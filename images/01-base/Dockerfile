@@ -15,6 +15,7 @@ RUN rm /sbin/poweroff /sbin/reboot /sbin/halt && \
        /var/spool \
        /var/lib/misc && \
     mkdir -p \
+       /etc/k3s \
        /home \
        /run \
        /var/cache \
