@@ -64,10 +64,6 @@ func engineSubcommands() []cli.Command {
 					Usage: fmt.Sprintf("set the version for the engine"),
 				},
 				cli.StringFlag{
-					Name:  "fixed-ip",
-					Usage: "set the fixed ip for the engine",
-				},
-				cli.StringFlag{
 					Name:  "ssh-port",
 					Usage: "set the ssh port for the engine",
 				},
@@ -396,26 +392,6 @@ func preFlightValidate(c *cli.Context) error {
 		if _, err := os.Stat(authorizedKeys); os.IsNotExist(err) {
 			return errors.New("The authorized-keys should be an exist file, recommended to put in the /opt or /var/lib/rancher directory")
 		}
-	}
-
-	network := c.String("network")
-	if network == "" {
-		return errors.New("Must specify network")
-	}
-
-	userDefineNetwork, err := CheckUserDefineNetwork(network)
-	if err != nil {
-		return err
-	}
-
-	fixedIP := c.String("fixed-ip")
-	if fixedIP == "" {
-		return errors.New("Must specify fix ip")
-	}
-
-	err = CheckUserDefineIPv4Address(fixedIP, *userDefineNetwork)
-	if err != nil {
-		return err
 	}
 
 	if c.String("ssh-port") != "" {
