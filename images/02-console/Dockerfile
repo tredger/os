@@ -1,6 +1,8 @@
 FROM debian:stable-slim
 
-COPY build/sshd_config.append.tpl /etc/ssh/
+COPY init /
+COPY fstab /etc/
+COPY sshd_config.append.tpl /etc/ssh/
 COPY build/lsb-release /etc/
 
 RUN apt-get update \
@@ -8,8 +10,7 @@ RUN apt-get update \
                            sudo less curl ca-certificates psmisc htop kmod iproute2 \
                            net-tools bash-completion wget \
                            nano open-iscsi iputils-ping \
-    && update-alternatives --set iptables /usr/sbin/iptables-legacy \
-    && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy \
+                           acpid busybox isc-dhcp-client logrotate syslog-ng-core \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /etc/ssh/*key* \
     && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen \
@@ -35,6 +36,4 @@ RUN apt-get update \
     && echo 'user-docker:100000:65536' > /etc/subuid \
     && echo 'user-docker:100000:65536' > /etc/subgid
 
-COPY build/iscsid.conf /etc/iscsi/
-
-ENTRYPOINT ["/usr/bin/ros", "entrypoint"]
+COPY iscsid.conf /etc/iscsi/

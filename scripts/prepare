@@ -11,5 +11,5 @@ fi
 
 ./template
 ./build-images
-./tar-images
+#./tar-images
 ./layout

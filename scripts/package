@@ -9,6 +9,6 @@ fi
 ./package-initrd
 
 if [ "$ARCH" == "amd64" ]; then
-    ./package-installer
+#    ./package-installer
     ./package-iso
 fi

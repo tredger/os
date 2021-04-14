@@ -18,20 +18,17 @@ function cache_services() {
 echo Create initrd layout in $INITRD_DIR
 
 rm -rf ${INITRD_DIR}
+mkdir -p ${INITRD_DIR}
+
+# Use burmilla/os-console image content as baseline for initrd
+id=$(docker create burmilla/os-console)
+docker cp $id:/ ${INITRD_DIR}/
+docker rm -v $id
+
 mkdir -p ${INITRD_DIR}/usr/{etc,lib,bin,share/ros}
 
 ./scripts/template
-
-cp -rf assets/selinux          ${INITRD_DIR}/usr/etc
-cp build/images*.tar           ${INITRD_DIR}/usr/share/ros/
 cp bin/ros                     ${INITRD_DIR}/usr/bin/
-ln -s usr/bin/ros              ${INITRD_DIR}/init
-ln -s bin                      ${INITRD_DIR}/usr/sbin
-ln -s usr/sbin                 ${INITRD_DIR}/sbin
-
-curl -SL ${!SYSTEM_DOCKER_URL} | tar --strip-components=1 -xzvf - -C ${INITRD_DIR}/usr/bin/
-# we have diabled the user-proxy so we get rid of system-docker-proxy
-rm -f ${INITRD_DIR}/usr/bin/system-docker-proxy
 
 cat <<HERE > ${INITRD_DIR}/usr/share/ros/os-release
 NAME="BurmillaOS"
@@ -46,70 +43,6 @@ BUG_REPORT_URL="https://github.com/burmilla/os/issues"
 BUILD_ID=
 HERE
 
-# cache os-services yml file
-for file in $(find . -type f -name ".make-*"); do
-    f_file=$(basename ${file})
-    case $f_file in
-        ".make-vmware")
-            cache_services "o/open-vm-tools.yml"
-            ;;
-        ".make-4glte")
-            cache_services "m/modem-manager.yml"
-            ;;
-        ".make-hyperv")
-            cache_services "h/hyperv-vm-tools.yml"
-            ;;
-        ".make-azurebase")
-            cache_services "h/hyperv-vm-tools.yml"
-            cache_services "w/waagent.yml"
-            ;;
-        ".make-proxmoxve")
-            cache_services "q/qemu-guest-agent.yml"
-            ;;
-    esac
-done
-case ${OS_CONSOLE} in
-    "alpine")
-        cache_services "a/alpine.yml"
-        ;;
-    "centos")
-        cache_services "c/centos.yml"
-        ;;
-    "debian")
-        cache_services "d/debian.yml"
-        ;;
-    "fedora")
-        cache_services "f/fedora.yml"
-        ;;
-    "ubuntu")
-        cache_services "u/ubuntu.yml"
-        ;;
-esac
-
 pushd ${INITRD_DIR}/usr/etc
 ln -s ../share/ros/os-release .
-popd
-
-# Support upgrades from old persistent consoles that bind mount these
-touch ${INITRD_DIR}/usr/bin/docker-containerd
-touch ${INITRD_DIR}/usr/bin/docker-containerd-shim
-touch ${INITRD_DIR}/usr/bin/docker
-
-if [ -e ${DOWNLOADS}/policy.29 ]; then
-    mkdir -p ${INITRD_DIR}/usr/etc/selinux/ros/policy/
-    cp ${DOWNLOADS}/policy.29 ${INITRD_DIR}/usr/etc/selinux/ros/policy/
-fi
-
-# make burmilla/os-initrd image
-cat <<HERE > ${INITRD_DIR}/../Dockerfile.initrd
-FROM scratch
-COPY initrd/* /
-HERE
-
-name="os-initrd"
-tag="${OS_REPO}/${name}:${VERSION}${SUFFIX}"
-pushd .
-cd ${INITRD_DIR}/..
-docker build -t ${OS_REPO}/${name} -f Dockerfile.initrd .
-docker tag burmilla/${name} ${tag}
 popd
